@@ -8,9 +8,9 @@ class CreateVotingScreen extends StatefulWidget {
 }
 
 class _CreateVotingScreenState extends State<CreateVotingScreen> {
-  final TextEditingController questionController = TextEditingController();
   final TextEditingController optionController = TextEditingController();
-  List<String> options = [];
+  final TextEditingController descriptionController = TextEditingController();
+  List<Map<String, String>> options = [];
 
   @override
   Widget build(BuildContext context) {
@@ -28,43 +28,69 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: questionController,
-              decoration: InputDecoration(labelText: 'Pregunta de la votación'),
-            ),
-            TextField(
-              controller: optionController,
-              decoration: InputDecoration(labelText: 'Opción'),
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  TextField(
+                    controller: optionController,
+                    decoration: InputDecoration(
+                      labelText: 'Opción',
+                      prefixIcon: Icon(Icons.edit),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                      labelText: 'Descripción',
+                      prefixIcon: Icon(Icons.description),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: addOption,
+                    icon: Icon(Icons.add),
+                    label: Text('Agregar Opción'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red[400]),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Opciones añadidas:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          leading: Icon(Icons.label, color: Colors.red[400]),
+                          title: Text(options[index]['option']!),
+                          subtitle: Text(options[index]['description']!),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red[400]),
+                            onPressed: () {
+                              setState(() {
+                                options.removeAt(index);
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: addOption,
-              child: Text('Agregar Opción'),
-            ),
-            ElevatedButton(
-              onPressed: createVoting,
+              onPressed: options.length >= 2 ? createVoting : null,
               child: Text('Crear Votación'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: options.length >= 2 ? Colors.green : Colors.grey,
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: options.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(options[index]),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          options.removeAt(index);
-                        });
-                      },
-                    ),
-                  );
-                },
               ),
             ),
           ],
@@ -74,23 +100,26 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
   }
 
   void addOption() {
-    if (optionController.text.isNotEmpty) {
+    if (optionController.text.isNotEmpty && descriptionController.text.isNotEmpty) {
       setState(() {
-        options.add(optionController.text);
+        options.add({
+          'option': optionController.text,
+          'description': descriptionController.text,
+        });
         optionController.clear();
+        descriptionController.clear();
       });
     }
   }
 
   void createVoting() {
-    if (questionController.text.isNotEmpty && options.length >= 2) {
-      Provider.of<VotingManager>(context, listen: false).createVoting(
-        questionController.text,
-        options,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Su votación ha sido creada')),
-      );
-    }
+    Provider.of<VotingManager>(context, listen: false).createVoting(
+      'Votación sin pregunta específica',
+      options.map((opt) => opt['option']!).toList(),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Su votación ha sido creada')),
+    );
+    Navigator.of(context).pop();
   }
 }
