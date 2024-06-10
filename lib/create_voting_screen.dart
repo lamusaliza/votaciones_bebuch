@@ -31,31 +31,6 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
             Expanded(
               child: ListView(
                 children: <Widget>[
-                  TextField(
-                    controller: optionController,
-                    decoration: InputDecoration(
-                      labelText: 'Opción',
-                      prefixIcon: Icon(Icons.edit),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  TextField(
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      labelText: 'Descripción',
-                      prefixIcon: Icon(Icons.description),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: addOption,
-                    icon: Icon(Icons.add),
-                    label: Text('Agregar Opción'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red[400]),
-                  ),
-                  SizedBox(height: 20),
                   Text(
                     'Opciones añadidas:',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -96,6 +71,62 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return _buildAddOptionDialog(context);
+            },
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildAddOptionDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('Agregar Nueva Opción'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: optionController,
+            decoration: InputDecoration(
+              labelText: 'Opción',
+              prefixIcon: Icon(Icons.edit),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          SizedBox(height: 10),
+          TextField(
+            controller: descriptionController,
+            decoration: InputDecoration(
+              labelText: 'Descripción',
+              prefixIcon: Icon(Icons.description),
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancelar'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            addOption();
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.add),
+          label: Text('Agregar Opción'),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red[400]),
+        ),
+      ],
     );
   }
 
@@ -115,7 +146,7 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
   void createVoting() {
     Provider.of<VotingManager>(context, listen: false).createVoting(
       'Votación sin pregunta específica',
-      options.map((opt) => opt['option']!).toList(),
+      options,
     );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Su votación ha sido creada')),

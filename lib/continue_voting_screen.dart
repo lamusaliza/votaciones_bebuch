@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'voting_manager.dart';
 
-class ContinueVotingScreen extends StatelessWidget {
+class ContinueVotingScreen extends StatefulWidget {
+  @override
+  _ContinueVotingScreenState createState() => _ContinueVotingScreenState();
+}
+
+class _ContinueVotingScreenState extends State<ContinueVotingScreen> {
+  bool isLoggedIn = false;
+  bool hasVoted = false;
+
   @override
   Widget build(BuildContext context) {
     final votingManager = Provider.of<VotingManager>(context);
@@ -16,6 +24,19 @@ class ContinueVotingScreen extends StatelessWidget {
             Navigator.of(context).pop();
           },
         ),
+        actions: <Widget>[
+          isLoggedIn
+              ? IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              setState(() {
+                isLoggedIn = false;
+                hasVoted = false;
+              });
+            },
+          )
+              : SizedBox.shrink(),
+        ],
       ),
       body: votingManager.currentVoting == null
           ? Center(child: Text('No hay una votación en curso.'))
@@ -28,15 +49,36 @@ class ContinueVotingScreen extends StatelessWidget {
           ),
           ...votingManager.currentVoting!.options.map((option) {
             return ListTile(
-              title: Text(option),
-              onTap: () {
-                votingManager.vote(option);
+              title: Text(option['option']!),
+              subtitle: Text(option['description']!),
+              onTap: isLoggedIn && !hasVoted
+                  ? () {
+                votingManager.vote(option['option']!);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Votaste por $option')),
+                  SnackBar(
+                      content: Text(
+                          'Votaste por ${option['option']}')),
                 );
-              },
+                setState(() {
+                  hasVoted = true;
+                });
+              }
+                  : null,
             );
           }).toList(),
+          SizedBox(height: 20),
+          isLoggedIn
+              ? hasVoted
+              ? Center(child: Text('Ya has votado.'))
+              : SizedBox.shrink()
+              : ElevatedButton(
+            onPressed: () {
+              setState(() {
+                isLoggedIn = true;
+              });
+            },
+            child: Text('Iniciar Sesión'),
+          ),
         ],
       ),
     );

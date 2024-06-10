@@ -34,9 +34,10 @@ class CloseVotingScreen extends StatelessWidget {
           SizedBox(height: 10),
           ...votingManager.currentVoting!.options.map((option) {
             return ListTile(
-              title: Text(option),
+              title: Text(option['option']!),
+              subtitle: Text(option['description']!),
               trailing: Text(
-                  votingManager.currentVoting!.votes[option].toString()),
+                  votingManager.currentVoting!.votes[option['option']].toString()),
             );
           }).toList(),
           SizedBox(height: 20),

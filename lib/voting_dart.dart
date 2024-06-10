@@ -1,7 +1,7 @@
 class Voting {
   final int? id;
   final String question;
-  final List<String> options;
+  final List<Map<String, String>> options;
   final Map<String, int> votes;
 
   Voting({
@@ -14,7 +14,7 @@ class Voting {
   Voting copy({
     int? id,
     String? question,
-    List<String>? options,
+    List<Map<String, String>>? options,
     Map<String, int>? votes,
   }) =>
       Voting(
@@ -27,15 +27,25 @@ class Voting {
   static Voting fromJson(Map<String, Object?> json) => Voting(
     id: json[VotingFields.id] as int?,
     question: json[VotingFields.question] as String,
-    options: (json[VotingFields.options] as String).split(','),
-    votes: Map<String, int>.from(
-        (json[VotingFields.votes] as String).split(',').asMap()),
+    options: (json[VotingFields.options] as String)
+        .split('|')
+        .map((e) {
+      var split = e.split(':');
+      return {'option': split[0], 'description': split[1]};
+    }).toList(),
+    votes: Map<String, int>.fromIterable(
+        (json[VotingFields.votes] as String).split(','),
+        key: (item) => item.split(':')[0],
+        value: (item) => int.parse(item.split(':')[1])
+    ),
   );
 
   Map<String, Object?> toJson() => {
     VotingFields.id: id,
     VotingFields.question: question,
-    VotingFields.options: options.join(','),
+    VotingFields.options: options
+        .map((option) => '${option['option']}:${option['description']}')
+        .join('|'),
     VotingFields.votes: votes.entries
         .map((entry) => '${entry.key}:${entry.value}')
         .join(','),

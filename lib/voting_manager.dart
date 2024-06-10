@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'voting_dart.dart';
 import 'database_helper.dart';
-
 class VotingManager extends ChangeNotifier {
   Voting? currentVoting;
 
-  Future<void> createVoting(String question, List<String> options) async {
+  Future<void> createVoting(String question, List<Map<String, String>> options) async {
     currentVoting = Voting(
       question: question,
       options: options,
-      votes: Map.fromIterable(options, key: (o) => o, value: (o) => 0), id: null,
+      votes: Map.fromIterable(options.map((o) => o['option']!), key: (o) => o, value: (o) => 0),
+      id: null,
     );
     await DatabaseHelper.instance.create(currentVoting!);
     notifyListeners();
