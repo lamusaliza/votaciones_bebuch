@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'create_voting_screen.dart';
 import 'voting_manager.dart';
 
 class ContinueVotingScreen extends StatefulWidget {
@@ -39,7 +40,28 @@ class _ContinueVotingScreenState extends State<ContinueVotingScreen> {
         ],
       ),
       body: votingManager.currentVoting == null
-          ? Center(child: Text('No hay una votación en curso.'))
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('No hay una votación en curso.'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, // Cambia 'Colors.blue' por el color que desees
+                foregroundColor: Colors.white, // Cambia el color del texto si es necesario
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateVotingScreen()),
+                );
+              },
+              child: Text('Haz click aquí para crear una votación.'),
+
+            ),
+          ],
+        ),
+      )
           : ListView(
         padding: const EdgeInsets.all(16.0),
         children: <Widget>[

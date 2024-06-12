@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
 }
 
 class WelcomeScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +115,9 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget buttonsColumn(BuildContext context) {
+    final votingManager = Provider.of<VotingManager>(context);
+    final bool isVotingActive = votingManager.currentVoting != null;
+
     return Column(
       children: <Widget>[
         createButton('Crear Nueva Votación', Icons.add, () {
@@ -127,13 +131,13 @@ class WelcomeScreen extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => ContinueVotingScreen()),
           );
-        }),
+        }, isEnabled: isVotingActive), // Deshabilitado si no hay votación activa
         createButton('Cerrar Votación', Icons.close, () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => CloseVotingScreen()),
           );
-        }),
+        }, isEnabled: isVotingActive), // Deshabilitado si no hay votación activa
         createButton('Consulta de Resultados', Icons.list, () {
           Navigator.push(
             context,
@@ -144,32 +148,34 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget createButton(String text, IconData icon, VoidCallback onPress) {
+// Tu función createButton original, modificada para manejar la deshabilitación
+  Widget createButton(String text, IconData icon, VoidCallback onPress, {bool isEnabled = true}) {
     return GestureDetector(
-      onTap: onPress,
+      onTap: isEnabled ? onPress : null, // Deshabilitar el onPress si no está activo
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Margen alrededor del botón
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10), // Ajuste de padding
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
         decoration: BoxDecoration(
-          color: Colors.red[100], // Botones con fondo rojo claro
+          color: isEnabled ? Colors.red[100] : Colors.grey[300], // Color de fondo condicional
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 2,
-              offset: Offset(0, 2),
-            ),
+            if (isEnabled) // Sombra solo si está habilitado
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 2,
+                offset: Offset(0, 2),
+              ),
           ],
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.red[800]), // Añade el icono al botón
-            SizedBox(width: 10), // Espacio entre el icono y el texto
+            Icon(icon, color: isEnabled ? Colors.red[800] : Colors.grey[600]), // Color de icono condicional
+            SizedBox(width: 10),
             Text(
               text,
               style: TextStyle(
-                color: Colors.red[800], // Texto en color rojo oscuro
+                color: isEnabled ? Colors.red[800] : Colors.grey[600], // Color de texto condicional
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -179,6 +185,7 @@ class WelcomeScreen extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class CustomClipperHalf extends CustomClipper<Path> {

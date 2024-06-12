@@ -11,6 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: any
+  sqflite_common_ffi: ^2.0.0+1
+  intl: ^0.17.0
+  charts_flutter:
+    git:
+      url: https://github.com/google/charts.git
+      path: charts_flutter
+
+
   path: any
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.3

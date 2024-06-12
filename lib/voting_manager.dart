@@ -25,11 +25,15 @@ class VotingManager extends ChangeNotifier {
 
   Future<void> closeVoting() async {
     if (currentVoting != null) {
+      print("Closing voting...");
       await DatabaseHelper.instance.addToHistory(currentVoting!);
+      await DatabaseHelper.instance.deleteCurrentVoting();
+      print("Voting closed, updating state...");
       currentVoting = null;
       notifyListeners();
     }
   }
+
 
   Future<void> loadCurrentVoting() async {
     currentVoting = await DatabaseHelper.instance.getCurrentVoting();

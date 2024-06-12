@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart'; // Importa intl package
 import 'voting_manager.dart';
 
 class CreateVotingScreen extends StatefulWidget {
@@ -144,8 +145,9 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
   }
 
   void createVoting() {
+    final String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(DateTime.now());
     Provider.of<VotingManager>(context, listen: false).createVoting(
-      'Votación sin pregunta específica',
+      'Votación $formattedDate', // Incluye la fecha en el título
       options,
     );
     ScaffoldMessenger.of(context).showSnackBar(

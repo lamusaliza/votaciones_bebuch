@@ -114,15 +114,16 @@ class DatabaseHelper {
     }
   }
 
+  Future<void> addToHistory(Voting voting) async {
+    final db = await instance.database;
+    await db.insert(tableVotingHistory, voting.toJson());
+  }
+
   Future<void> deleteCurrentVoting() async {
     final db = await instance.database;
     await db.delete(tableVoting);
   }
 
-  Future<void> addToHistory(Voting voting) async {
-    final db = await instance.database;
-    await db.insert(tableVotingHistory, voting.toJson());
-  }
 
   Future<List<Voting>> getVotingHistory() async {
     final db = await instance.database;
