@@ -54,8 +54,6 @@ class ResultsScreen extends StatelessWidget {
   }
 }
 
-
-
 class VotingResultsScreen extends StatelessWidget {
   final Voting voting;
 
@@ -63,19 +61,27 @@ class VotingResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final totalVotes = voting.votes.values.reduce((a, b) => a + b);
     final highestVoteCount = voting.votes.values.reduce((a, b) => a > b ? a : b);
-    final winner = voting.votes.entries.firstWhere((entry) => entry.value == highestVoteCount).key;
+    final winners = voting.votes.entries
+        .where((entry) => entry.value == highestVoteCount)
+        .map((entry) => entry.key)
+        .toList();
 
     List<charts.Series<VoteData, String>> series = [
       charts.Series(
         id: 'Votes',
-        data: voting.votes.entries.map((e) => VoteData(e.key, e.value)).toList(),
+        data: voting.votes.entries.map((e) => VoteData(e.key, e.value, (e.value / totalVotes) * 100)).toList(),
         domainFn: (VoteData voteData, _) => voteData.option,
         measureFn: (VoteData voteData, _) => voteData.count,
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        labelAccessorFn: (VoteData voteData, _) => '${voteData.option}: ${voteData.count}',
+        labelAccessorFn: (VoteData voteData, _) => '${voteData.option}: ${voteData.count} (${voteData.percentage.toStringAsFixed(1)}%)',
       )
     ];
+
+    String winnersText = winners.length > 1
+        ? 'Empate entre: ${winners.join(", ")} con $highestVoteCount votos cada uno'
+        : 'Ganador: ${winners.first} con $highestVoteCount votos';
 
     return Scaffold(
       appBar: AppBar(
@@ -96,7 +102,7 @@ class VotingResultsScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-              'Ganador: $winner con $highestVoteCount votos',
+              winnersText,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
             ),
           ],
@@ -109,7 +115,7 @@ class VotingResultsScreen extends StatelessWidget {
 class VoteData {
   final String option;
   final int count;
+  final double percentage;
 
-  VoteData(this.option, this.count);
+  VoteData(this.option, this.count, this.percentage);
 }
-

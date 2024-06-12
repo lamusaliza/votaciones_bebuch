@@ -18,6 +18,7 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Crear Nueva Votación'),
+        backgroundColor: Colors.redAccent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -33,8 +34,8 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
               child: ListView(
                 children: <Widget>[
                   Text(
-                    'Opciones añadidas:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    options.isEmpty ? 'Agrega Candidatos:' : 'Candidatos añadidas:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
                   ),
                   ListView.builder(
                     shrinkWrap: true,
@@ -43,11 +44,11 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
-                          leading: Icon(Icons.label, color: Colors.red[400]),
-                          title: Text(options[index]['option']!),
+                          leading: Icon(Icons.label, color: Colors.redAccent),
+                          title: Text(options[index]['option']!, style: TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Text(options[index]['description']!),
                           trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red[400]),
+                            icon: Icon(Icons.delete, color: Colors.redAccent),
                             onPressed: () {
                               setState(() {
                                 options.removeAt(index);
@@ -66,13 +67,15 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
               onPressed: options.length >= 2 ? createVoting : null,
               child: Text('Crear Votación'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: options.length >= 2 ? Colors.green : Colors.grey,
+                backgroundColor: options.length >= 2 ? Colors.redAccent : Colors.grey,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.redAccent,
         onPressed: () {
           showDialog(
             context: context,
@@ -88,15 +91,15 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
 
   Widget _buildAddOptionDialog(BuildContext context) {
     return AlertDialog(
-      title: Text('Agregar Nueva Opción'),
+      title: Text('Agregar Nueva Candidato'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           TextField(
             controller: optionController,
             decoration: InputDecoration(
-              labelText: 'Opción',
-              prefixIcon: Icon(Icons.edit),
+              labelText: 'Candidato',
+              prefixIcon: Icon(Icons.edit, color: Colors.redAccent),
               border: OutlineInputBorder(),
             ),
           ),
@@ -105,7 +108,7 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
             controller: descriptionController,
             decoration: InputDecoration(
               labelText: 'Descripción',
-              prefixIcon: Icon(Icons.description),
+              prefixIcon: Icon(Icons.description, color: Colors.redAccent),
               border: OutlineInputBorder(),
             ),
           ),
@@ -116,7 +119,7 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancelar'),
+          child: Text('Cancelar', style: TextStyle(color: Colors.redAccent)),
         ),
         ElevatedButton.icon(
           onPressed: () {
@@ -124,8 +127,8 @@ class _CreateVotingScreenState extends State<CreateVotingScreen> {
             Navigator.of(context).pop();
           },
           icon: Icon(Icons.add),
-          label: Text('Agregar Opción'),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red[400]),
+          label: Text('Agregar Candidato'),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
         ),
       ],
     );

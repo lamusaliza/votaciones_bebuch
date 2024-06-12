@@ -11,6 +11,7 @@ class CloseVotingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Cerrar Votación'),
+        backgroundColor: Colors.redAccent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -19,15 +20,22 @@ class CloseVotingScreen extends StatelessWidget {
         ),
       ),
       body: votingManager.currentVoting == null
-          ?  Center(
+          ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('No hay una votación en curso.'),
+            Text(
+              'No hay una votación en curso.',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Cambia 'Colors.blue' por el color que desees
-                foregroundColor: Colors.white, // Cambia el color del texto si es necesario
+                backgroundColor: Colors.redAccent,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               onPressed: () {
                 Navigator.push(
@@ -36,53 +44,66 @@ class CloseVotingScreen extends StatelessWidget {
                 );
               },
               child: Text('Haz click aquí para crear una votación.'),
-
             ),
           ],
         ),
       )
           : ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: <Widget>[
-                Text(
-                  'Resultados de la votación:',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.all(16.0),
+        children: <Widget>[
+          Text(
+            'Resultados de la votación:',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent),
+          ),
+          SizedBox(height: 20),
+          Text(
+            votingManager.currentVoting!.question,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.redAccent),
+          ),
+          SizedBox(height: 10),
+          ...votingManager.currentVoting!.options.map((option) {
+            return Card(
+              child: ListTile(
+                leading: Icon(Icons.how_to_vote, color: Colors.redAccent),
+                title: Text(
+                  option['option']!,
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 20),
-                Text(
-                  votingManager.currentVoting!.question,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                subtitle: Text(option['description']!),
+                trailing: Text(
+                  votingManager.currentVoting!.votes[option['option']].toString(),
+                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
-                ...votingManager.currentVoting!.options.map((option) {
-                  return ListTile(
-                    title: Text(option['option']!),
-                    subtitle: Text(option['description']!),
-                    trailing: Text(votingManager
-                        .currentVoting!.votes[option['option']]
-                        .toString()),
-                  );
-                }).toList(),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await votingManager.closeVoting();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('La votación ha sido cerrada.')),
-                      );
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      // Muestra el error en un SnackBar
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
-                      );
-                    }
-                  },
-                  child: Text('Cerrar Votación'),
-                ),
-              ],
+              ),
+            );
+          }).toList(),
+          SizedBox(height: 20),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
+            onPressed: () async {
+              try {
+                await votingManager.closeVoting();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('La votación ha sido cerrada.')),
+                );
+                Navigator.of(context).pop();
+              } catch (e) {
+                // Muestra el error en un SnackBar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: $e')),
+                );
+              }
+            },
+            child: Text('Cerrar Votación', style: TextStyle(color: Colors.white),),
+          ),
+        ],
+      ),
     );
   }
 }
